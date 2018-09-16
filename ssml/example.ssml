@@ -1,0 +1,54 @@
+<speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.1">
+
+  <metadata>
+
+    <dc:title xml:lang="en">Hello readers</dc:title>
+
+  </metadata>
+
+  <p>
+
+    <s xml:lang="en-UK">
+
+      <voice name="David" gender="male" age="25">
+
+        Good day, is it <emphasis>tea time?</emphasis>
+
+      </voice>
+
+    </s>
+
+    <s xml:lang="en-US">
+
+      <voice name="David" gender="male" age="25">
+
+        Hey there, want some <emphasis>pie</emphasis>?
+
+      </voice>
+
+    </s>
+
+  </p>
+
+  <s xml:lang="en-US">
+
+  <voice name="David" gender="male" age="25">
+
+    Hey there, want some <prosody pitch="high" rate="slow">pie</prosody>?
+
+  </voice>
+
+  </s>
+  
+  
+  <s xml:lang="en-US">
+
+  <voice name="David" gender="male" age="25">
+
+    Hey there, want some <break time="3s" /> pie?
+
+  </voice>
+
+</s>
+  
+</speak>

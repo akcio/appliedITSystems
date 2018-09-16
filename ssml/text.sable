@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE SABLE PUBLIC "-//SABLE//DTD SABLE speech mark up//EN" 
+        "Sable.v0_2.dtd"
+[]>
+<SABLE>
+<SPEAKER NAME="male1">
+
+The boy saw the girl in the park <BREAK/> with the telescope.
+The boy saw the girl <BREAK/> in the park with the telescope.
+
+Some English first and then some Spanish.
+<LANGUAGE ID="SPANISH">Hola amigos.</LANGUAGE>
+<LANGUAGE ID="NEPALI">Namaste</LANGUAGE>
+
+Good morning <BREAK /> My name is Stuart, which is spelled
+<RATE SPEED="-40%">
+<SAYAS MODE="literal">stuart</SAYAS> </RATE>
+though some people pronounce it 
+<PRON SUB="stoo art">stuart</PRON>.  My telephone number
+is <SAYAS MODE="literal">2787</SAYAS>.
+
+I used to work in <PRON SUB="Buckloo">Buccleuch</PRON> Place, 
+but no one can pronounce that.
+
+By the way, my telephone number is actually
+<AUDIO SRC="http://www.cstr.ed.ac.uk/~awb/sounds/touchtone.2.au"/>
+<AUDIO SRC="http://www.cstr.ed.ac.uk/~awb/sounds/touchtone.7.au"/>
+<AUDIO SRC="http://www.cstr.ed.ac.uk/~awb/sounds/touchtone.8.au"/>
+<AUDIO SRC="http://www.cstr.ed.ac.uk/~awb/sounds/touchtone.7.au"/>.
+</SPEAKER>
+</SABLE>s 
