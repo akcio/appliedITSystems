@@ -1,8 +1,16 @@
-
+<?xml version="1.0"?>
+<!DOCTYPE SABLE PUBLIC "-//SABLE//DTD SABLE speech mark up//EN"
+	"Sable.v0_2.dtd"
+[]>
+<SABLE>
+<LANGUAGE ID="RUSSIAN">
 <PRON SUB="большиие">Большие</PRON> города,
+</LANGUAGE>
+</SABLE>
 
-<BREAK LEVEL="LARGE"/> Пустые поезда, 
-<BREAK LEVEL="LARGE"/> Ни берега, ни дна, 
+
+<BREAK LEVEL="LARGE"/> Пустые поезда,
+<BREAK LEVEL="LARGE"/> Ни берега, ни дна,
 <BREAK LEVEL="LARGE"/><BREAK LEVEL="LARGE"/>
 Всё начинать сначала.  <BREAK LEVEL="LARGE"/>
 
