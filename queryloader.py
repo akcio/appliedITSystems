@@ -15,7 +15,7 @@ class QueryLoader():
         return  query
 
     def searchQuery(self, text : str):
-        req = requests.get(self.generateQueryLink('opensearch', {'search': text, 'limit': 1, 'format': 'json'}))
+        req = requests.get(self.generateQueryLink('opensearch', {'search': text, 'limit': 2, 'format': 'json'}))
         data = req.json()
         if len(data) < 3:
             return 'Ничего не найдено, измените запрос.'
