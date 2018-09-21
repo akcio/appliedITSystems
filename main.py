@@ -1,9 +1,12 @@
 from queryloader import QueryLoader
-from SpeakerModule import Speaker
+from sphinxmodule import talk
+import pyaudio
 
 if __name__ == '__main__':
+    p = pyaudio.PyAudio()
     queryLoader = QueryLoader()
-    speaker = Speaker()
     while True:
         text = input("Что хотите найти:")
-        speaker.AddToQueue(queryLoader.searchQuery(text))
+        talk(queryLoader.searchQuery(text))
+
+    p.terminate()
