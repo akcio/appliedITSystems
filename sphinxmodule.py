@@ -43,6 +43,20 @@ def record(file = "/tmp/output.wav"):
     wf.close()
 
 
+def recognizeNow():
+    with sr.Microphone() as source:
+        print("Say something!")
+        audio = r.listen(source)
+        try:
+            res = r.recognize_google(audio, language="RU-ru")
+        except sr.UnknownValueError:
+            res = ''
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            res = ''
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+        return res
+
 def recognize(file = "/tmp/output.wav"):
     global sr
     # use the audio file as the audio source
@@ -68,9 +82,9 @@ def wikiMode(queryLoader = None):
     if queryLoader == None:
         talk("Не подключен модуль для работы с википедией")
         return
-    talk('Что хотите найти?')
-    record()
-    text = recognize()
+    talk('Что хотите найти? Для выхода скажи отмена')
+    # record()
+    text = recognizeNow()
     print('--' + text)
     if text.strip() == '':
         talk('Плохо слышно, попробуйте ещё')
@@ -80,6 +94,10 @@ def wikiMode(queryLoader = None):
         currentMode = ''
         return
     talk(queryLoader.searchQuery(text))
+
+def sayNumberMode():
+    from random import randint
+    cifer = randint(-999999999, 999999999)
 
 if __name__ == '__main__':
     p = pyaudio.PyAudio()
@@ -91,9 +109,10 @@ if __name__ == '__main__':
             if currentMode == 'wiki':
                 wikiMode(queryLoader)
                 continue
+
         talk('Выбери режим')
-        record()
-        text = recognize()
+        # record()
+        text = recognizeNow()
         print(text)
         if text.strip().lower() == 'вики':
             talk('Включен режим поиска в википедии')
