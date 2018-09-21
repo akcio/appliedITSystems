@@ -1,28 +1,23 @@
 <?xml version="1.0" ?>
-<speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.1">
-
-  <metadata>
-
-    <dc:title xml:lang="ru">Проверка</dc:title>
-
-  </metadata>
-
+<speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.1" xml:lang="ru">
   <p>
-
+    
+      <lexicon uri="dict.pls">
+      
     <s xml:lang="ru">
 
-      <voice name="Ann" gender="female" age="70">
 
-        Большие <prosody pitch="high" rate="slow">города</prosody>,
-        <break time="1s" /> Пустые <prosody pitch="high" rate="slow">поезда</prosody>.
-        <break time="1s" />Ни берега, ни дна.
+      <voice gender="female" age="70">
+
+        Большие городА,
+        <break time="1s" /> Пустые <prosody pitch="high" rate="slow">поездА</prosody>.
+        <break time="1s" />Ни берегА, ни дна.
 
 
-          <break time="1s" /> Всё начинать <prosody pitch="low">сначала</prosody>
-          <break time="2s" /> Холодная <emphasis>война</emphasis>.
-          <break time="1s" /> И время как <emphasis>вода</emphasis>.
+          <break time="1s" /> Всё начинАть <prosody pitch="low">сначалА</prosody>
+          <break time="2s" /> ХолоднаЯ <emphasis>война</emphasis>.
+          <break time="1s" /> И врЕмя как <emphasis>вода</emphasis>.
       </voice>
-
       <voice gender="female" age="18">
 
         Он не сошел с ума,
@@ -36,6 +31,7 @@
       </voice>
 
     </s>
+    </lexicon>
 
   </p>
 
