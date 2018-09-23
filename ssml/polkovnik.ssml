@@ -1,38 +1,56 @@
 <?xml version="1.0" ?>
 <speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.1" xml:lang="ru">
-  <p>
-    
-      <lexicon uri="dict.pls">
-      
-    <s xml:lang="ru">
+  <voice gender="female" age="70">
+
+    <p>
+        <prosody volume="soft" rate="slow" pitch="-20%">Большие</prosody><break time="20ms"/>
+        <prosody volume="soft" rate="medium" pitch="+80%">городА</prosody><break time="1s" />
+        <prosody volume="soft" rate="slow" pitch="-20%">Пустые</prosody><break time="20ms"/>
+        <prosody volume="soft" rate="medium" pitch="+100%">поездА</prosody><break time="1s" />
+        <prosody volume="soft" rate="slow" pitch="-10%">Ни</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="slow" pitch="+100%">берегА</prosody><break time="20ms"/>
+        <prosody volume="soft" rate="slow" pitch="-10%">Ни</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="slow" pitch="+100%">дна</prosody><break time="1s"/>
+
+    </p>
+    <p>
 
 
-      <voice gender="female" age="70">
+        <prosody volume="soft" rate="slow" pitch="-10%">Всё</prosody><break time="10ms" />
+        <prosody volume="soft" rate="slow" pitch="+30%">начинАть</prosody><break time="=40ms"/>
+        <prosody volume="soft" rate="slow" pitch="+150%">сначалА</prosody><break time="2s"/>
+    </p>
+    <p>
+        <prosody volume="soft" rate="slow" pitch="+50%">ХолоднаЯ</prosody><break time="25ms"/>
+        <prosody volume="soft" rate="slow" pitch="+100%">война</prosody><break time="1s"/>
+    </p>
+    <p>
+        <prosody volume="soft" rate="slow" pitch="-20%">И</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="medium" pitch="+50%">врЕмя</prosody><break time="25ms"/>
+        <prosody volume="soft" rate="slow" pitch="+50%">как</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="medium" pitch="+100%">вода</prosody><break time="50ms"/>
+    </p>
+    <p>
+        <prosody volume="soft" rate="slow" pitch="-50%">Он</prosody><break time="25ms"/>
+        <prosody volume="soft" rate="slow" pitch="+30%">не</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="slow" pitch="+30%">сошел</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="slow" pitch="+100%">с ума</prosody><break time="500ms"/>
+        <prosody volume="soft" rate="slow" pitch="+30%">Ты</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="slow" pitch="+30%">ничего</prosody><break time="30ms"/>
+        <prosody volume="soft" rate="slow" pitch="+100%">не</prosody><break time="25ms"/>
+        <prosody volume="soft" rate="slow" pitch="+100%">знала</prosody><break time="800ms"/>
 
-        Большие городА,
-        <break time="1s" /> Пустые <prosody pitch="high" rate="slow">поездА</prosody>.
-        <break time="1s" />Ни берегА, ни дна.
+    </p>
+    <p>
+        <prosody volume="soft" rate="medium" pitch="-20%">полковнику</prosody><break time="30ms"/>
+        <prosody volume="soft" rate="medium" pitch="+100%">никто</prosody><break time="400ms"/>
+        <prosody volume="soft" rate="slow" pitch="-20%">не</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="medium" pitch="+160%">пишет</prosody><break time="1s"/>
+        <prosody volume="soft" rate="slow" pitch="-50%">полковника</prosody><break time="20ms"/>
+        <prosody volume="soft" rate="slow" pitch="+60%">никто</prosody><break time="10ms"/>
+        <prosody volume="soft" rate="x-slow" pitch="+150%">не ждёт</prosody><break time="60ms"/>
+    </p>
 
 
-          <break time="1s" /> Всё начинАть <prosody pitch="low">сначалА</prosody>
-          <break time="2s" /> ХолоднаЯ <emphasis>война</emphasis>.
-          <break time="1s" /> И врЕмя как <emphasis>вода</emphasis>.
-      </voice>
-      <voice gender="female" age="18">
-
-        Он не сошел с ума,
-        Ты ничего не знала!
-        <break time="1s" />Полковнику никто не пишет.
-
-
-          <break time="1s" />  <prosody pitch="low">Полковника</prosody>
-          <break time="1s" /> никто <emphasis>не ждёт</emphasis>.
-
-      </voice>
-
-    </s>
-    </lexicon>
-
-  </p>
-
+  </voice>
 </speak>
