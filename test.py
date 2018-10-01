@@ -1,22 +1,28 @@
- 
-#!/usr/bin/env python3
-
-# NOTE: this example requires PyAudio because it uses the Microphone class
-
-import speech_recognition as sr
-
-# obtain audio from the microphone
-r = sr.Recognizer()
-with sr.Microphone() as source:
-    print("Say something!")
-    audio = r.listen(source)
-# recognize speech using Google Speech Recognition
-try:
-    # for testing purposes, we're just using the default API key
-    # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-    # instead of `r.recognize_google(audio)`
-    print("Google Speech Recognition thinks you said " + r.recognize_google(audio, language="RU-ru"))
-except sr.UnknownValueError:
-    print("Google Speech Recognition could not understand audio")
-except sr.RequestError as e:
-    print("Could not request results from Google Speech Recognition service; {0}".format(e))
+from lxml import etree
+from pyfreeling import Analyzer
+from os import path
+import subprocess
+CONFIG_FOLDER = path.join(path.dirname(__file__), 'freeling/data/config/')
+FILE_FOLDER = path.join(path.dirname(__file__), 'freeling/')
+inputText=open(path.join(FILE_FOLDER, 'test'))
+inputText=inputText.read()
+print(inputText)
+analyzer = Analyzer(config=path.join(CONFIG_FOLDER, 'ru.cfg'))
+print('start analyze')
+xml = analyzer.run(inputText.encode())
+print(type(xml))
+root = xml #etree.parse(xml)
+rows = root.findall('sentence')
+nlist = {}
+for s in rows:
+    tok = s.findall('token')
+    for t in tok:
+        if t.attrib['form'] not in nlist:
+            nlist.update({t.attrib['form']:1})
+        else:
+            nlist[t.attrib['form']]+=1
+   
+result=''
+for key in nlist:
+    
+    print ('у слова ', type(key), key,' количество вхождений равно',nlist[key])
