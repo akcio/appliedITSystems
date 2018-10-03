@@ -29,9 +29,11 @@ for s in sen:
             if tag[0] == 'N':
                 if len(tag) > 3:
                     nouns.append({'gen' : tag[2], 'num' : tag[3], 'form' : t.attrs['form'].lower(), 'lemma' : t.attrs['lemma'].lower()})
-                elif len(tag) > 2:
-                    nouns.append({'gen' : tag[2], 'num' : -1, 'form' : t.attrs['form'].lower(), 'lemma' : t.attrs['lemma'].lower()})
+                # elif len(tag) > 2:
+                #     print(tag)
+                #     nouns.append({'gen' : tag[2], 'num' : -1, 'form' : t.attrs['form'].lower(), 'lemma' : t.attrs['lemma'].lower()})
                 else:
+                    print(tag, t.attrs['lemma'])
                     pass
                     #nouns.append({'gen' : tag[2], 'num' : -1, 'form' : t.attrs['form']})
             elif tag[0] == 'V':
@@ -50,12 +52,12 @@ for s in sen:
         #     exceptions.append(t.attrs['form'])
     for verb in verbs:
         for noun in nouns:
-            if (noun['gen'] == verb['gen'] or noun['gen'] == -1) and (noun['num'] == verb['num'] or noun['num'] == -1):
+            if noun['gen'] == 'N' and (noun['gen'] == verb['gen'] or noun['gen'] == -1) and (noun['num'] == verb['num'] or noun['num'] == -1):
                 if verb['lemma'] not in localSentences:
                     localSentences.update({verb['lemma'] : {'verb' : verb['form'], 'noun' : [noun['form']]}})
                 else:
                     if noun['form'] not in localSentences[verb['lemma']]['noun']:
-                        localSentences[verb['lemma']]['noun'].append(noun['form'])
+                        localSentences[verb['lemma']]['noun'].append(noun['lemma'])
     # print(localSentences)
     for key in localSentences:
         print(",".join(localSentences[key]['noun']) + " " + localSentences[key]['verb'])
@@ -69,10 +71,13 @@ defaultNumb=1
 result=str()
 for key in nlist:
     print ('у слова ', key,' количество вхождений равно', nlist[key])
+isFirst = True
 for key in nlist:
     if int(nlist[key]) > 1:
+        if not isFirst:
+            result += ", "
         result +=str(key)
-        result +=', '
+        isFirst = False
 print ('\nКлючевыми в этом текте являются слова: ')
 print (result)
 print ('Неизвестные слова:')
