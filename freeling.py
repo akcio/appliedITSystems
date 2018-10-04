@@ -33,7 +33,7 @@ for s in sen:
                 #     print(tag)
                 #     nouns.append({'gen' : tag[2], 'num' : -1, 'form' : t.attrs['form'].lower(), 'lemma' : t.attrs['lemma'].lower()})
                 else:
-                    print(tag, t.attrs['lemma'])
+                    # print(tag, t.attrs['lemma'])
                     pass
                     #nouns.append({'gen' : tag[2], 'num' : -1, 'form' : t.attrs['form']})
             elif tag[0] == 'V':
@@ -63,21 +63,29 @@ for s in sen:
         print(",".join(localSentences[key]['noun']) + " " + localSentences[key]['verb'])
         for noun in localSentences[key]['noun']:
             if noun.lower() not in nlist:
-                nlist.update({noun.lower() : 1})
+                nlist.update({noun.lower() : {'count' : 1, 'verbs': {localSentences[key]['verb'] : 1}}})
             else:
-                nlist[noun.lower()] += 1
+                if localSentences[key]['verb'] not in nlist[noun.lower()]['verbs']:
+                    nlist[noun.lower()]['verbs'].update({localSentences[key]['verb'] : 1})
+                else:
+                    nlist[noun.lower()]['verbs'][localSentences[key]['verb']] += 1
+                nlist[noun.lower()]['count'] += 1
 defaultNumb=1
 
 result=str()
 for key in nlist:
-    print ('у слова ', key,' количество вхождений равно', nlist[key])
+    print ('у слова ', key,' количество вхождений равно', nlist[key]['count'])
 isFirst = True
 for key in nlist:
-    if int(nlist[key]) > 1:
-        if not isFirst:
-            result += ", "
-        result +=str(key)
-        isFirst = False
+    for verb in nlist[key]['verbs']:
+        item = nlist[key]['verbs'][verb]
+        print(item)
+        if int(item) > 1:
+            if not isFirst:
+                result += ", "
+            result +=str(key) + " " + str(verb)
+            isFirst = False
+
 print ('\nКлючевыми в этом текте являются слова: ')
 print (result)
 print ('Неизвестные слова:')
