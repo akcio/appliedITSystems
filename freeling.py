@@ -74,17 +74,23 @@ defaultNumb=1
 
 result=str()
 for key in nlist:
-    print ('у слова ', key,' количество вхождений равно', nlist[key]['count'])
+    nlist[key]['average'] = sum([ nlist[key]['verbs'][x] for x in nlist[key]['verbs']]) / len(nlist[key]['verbs'])
+    print ('у слова ', key,' количество вхождений равно', nlist[key]['count'], 'среднее по существительному:', nlist[key]['average'])
 isFirst = True
 for key in nlist:
-    for verb in nlist[key]['verbs']:
-        item = nlist[key]['verbs'][verb]
-        print(item)
-        if int(item) > 1:
-            if not isFirst:
-                result += ", "
-            result +=str(key) + " " + str(verb)
-            isFirst = False
+    if nlist[key]['average'] > 1:
+        if not isFirst:
+            result += ", "
+        sort = sorted(nlist[key]['verbs'].items(), key=lambda kv:kv[1], reverse=True)
+        # print(sort)
+        result += str(key) + " " + ",".join([verb + ":" + str(verb_count) for verb, verb_count in sort if verb_count > 1]) + '\n'
+    # for verb in nlist[key]['verbs']:
+    #     item = nlist[key]['verbs'][verb]
+    #     if int(item) > 1:
+    #         if not isFirst:
+    #             result += ", "
+    #         result +=str(key) + " " + str(verb)
+    #         isFirst = False
 
 print ('\nКлючевыми в этом текте являются слова: ')
 print (result)
