@@ -10,7 +10,7 @@ FILE_FOLDER = path.join(path.dirname(__file__), 'freeling/')
 inputText=open(path.join(FILE_FOLDER, 'test'))
 inputText=inputText.read()
 
-p = subprocess.Popen('analyze -f ' + path.join(CONFIG_FOLDER, 'ru.cfg') + ' --output xml < ' + path.join(FILE_FOLDER, 'test2'),
+p = subprocess.Popen('analyze -f ' + path.join(CONFIG_FOLDER, 'ru.cfg') + ' --output xml < ' + path.join(FILE_FOLDER, 'test4.txt'),
                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 r = p.communicate()
 t = r[0]
@@ -73,15 +73,28 @@ for s in sen:
 defaultNumb=1
 
 result=str()
+superVerbs = {}
+
 for key in nlist:
     nlist[key]['average'] = sum([ nlist[key]['verbs'][x] for x in nlist[key]['verbs']]) / len(nlist[key]['verbs'])
+    for item in nlist[key]['verbs']:
+        if item not in superVerbs:
+            superVerbs.update({item: nlist[key]['verbs'][item]})
+        else:
+            superVerbs[item] += 1
     print ('у слова ', key,' количество вхождений равно', nlist[key]['count'], 'среднее по существительному:', nlist[key]['average'])
 isFirst = True
-for key in nlist:
-    if nlist[key]['average'] > 1:
+
+averageVervs = sum([superVerbs[x] for x in superVerbs]) / len(superVerbs)
+# trashhold = sum([nlist[x]['count'] for x in nlist]) / sum([[]])
+
+sortedNList = sorted(nlist.items(), key=lambda kv:kv[1]['count'], reverse=True)[:4]
+
+for key, nlist[key] in sortedNList:
+    if nlist[key]['count'] > 1:
         if not isFirst:
             result += ", "
-        sort = sorted(nlist[key]['verbs'].items(), key=lambda kv:kv[1], reverse=True)
+        sort = sorted(nlist[key]['verbs'].items(), key=lambda kv:kv[1], reverse=True)[:2]
         # print(sort)
         result += str(key) + " " + ",".join([verb + ":" + str(verb_count) for verb, verb_count in sort if verb_count > 1]) + '\n'
     # for verb in nlist[key]['verbs']:
