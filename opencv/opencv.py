@@ -27,4 +27,13 @@ cv2.drawContours(im, contours, -1, (0,255,0), 3)
 img = cv2.imread(os.path.join(trainsetFolder, 'digits_inverse.png'))
 imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-plt.hist(img.ravel(),256,[0,256]); plt.show()
+
+img0 = [sum(imgGray[k]) for k in range(imgGray.shape[0])]
+img1 = [min(x, 10) for x in img0]
+# img1 = [img0[x] - minimal for x in range(len(img0))]
+plt.title("Гистограмма по строкам")
+plt.plot(range(len(img0)), img0); plt.show()
+
+
+plt.title("Гистограмма по строкам new")
+plt.plot(range(len(img1)), img1); plt.show()
