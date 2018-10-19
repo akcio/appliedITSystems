@@ -89,7 +89,7 @@ knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
-results, results, neighbours ,dist = knn.findNearest(trainData[0], 3)
+res, results, neighbours ,dist = knn.findNearest(numpy.array(trainData[4700], dtype=numpy.float32).reshape(1,-1), 3)
 
 print( "result: ", results,"\n")
 print( "neighbours: ", neighbours,"\n")
