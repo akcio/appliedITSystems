@@ -72,7 +72,8 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
         imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
                     yPoints['start'][y]:yPoints['end'][y] + 1]
         if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
-            trainData += [imageNumber]
+            imageNumber = numpy.array(cv2.resize(imageNumber, (17,17), interpolation=cv2.INTER_AREA)).reshape(17*17, -1)
+            trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
             responses.append(int(len(responses) / 500))
 
 
@@ -85,13 +86,13 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
 print("Len trainData:", len(trainData))
 
 knn = cv2.ml.KNearest_create()
-trainData = numpy.array(trainData)
-responses = numpy.array(responses).astype(numpy.float32)
-knn.train(trainData, cv2.ml.ROW_SAMPLE, responses)
-# ret, results, neighbours ,dist = knn.find_nearest(trainData[0], 3)
-#
-# print( "result: ", results,"\n")
-# print( "neighbours: ", neighbours,"\n")
-# print( "distance: ", dist)
+responses = numpy.array(responses)
+knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
+
+results, results, neighbours ,dist = knn.findNearest(trainData[0], 3)
+
+print( "result: ", results,"\n")
+print( "neighbours: ", neighbours,"\n")
+print( "distance: ", dist)
 
 plt.show()
