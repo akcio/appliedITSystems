@@ -26,6 +26,105 @@ def calcBorders(points : list):
 curFolder = os.path.dirname(__file__)
 trainsetFolder = os.path.join(curFolder, 'trainset')
 
+def prepareImage(path, needInverse = False, drawPlot = False, saveToFiles = False):
+    img = cv2.imread(path)
+    if needInverse:
+        img = cv2.bitwise_not(img)
+    imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    cv2.imwrite(os.path.join(curFolder, 'test_inverse.png'), img)
+
+    xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
+    xGist_median = numpy.median(xGist) * 0.78
+    xGistNorm = [min(x, xGist_median) for x in xGist]
+    if drawPlot:
+        plt.title("Гистограмма по строкам")
+        plt.plot(range(len(xGist)), xGist); plt.show()
+        plt.title("Гистограмма по строкам new")
+        plt.plot(range(len(xGistNorm)), xGistNorm); plt.show()
+
+    xPoints = calcBorders(xGistNorm)
+
+    yGist = [sum(imgGray[:, k]) / len(imgGray[:, k]) for k in range(imgGray.shape[1])]
+    yGist_median = numpy.median(yGist) * 0.78
+    yGistNorm = [min(x, yGist_median) for x in yGist]
+
+    if drawPlot:
+        plt.title("Гистограмма по столбцам")
+        plt.plot(range(len(yGist)), yGist); plt.show()
+        plt.title("Гистограмма по стобцам new")
+        plt.plot(range(len(yGistNorm)), yGistNorm); plt.show()
+
+    yPoints = calcBorders(yGistNorm)
+
+    trainData = []
+    responses = []
+    number = 0
+    for x in range(min(len(xPoints['start']), len(xPoints['end']))):
+        for y in range(min(len(yPoints['start']), len(yPoints['end']))):
+            imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
+                          yPoints['start'][y]:yPoints['end'][y] + 1]
+            if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
+                # Save pictures to harddrive
+                if saveToFiles:
+                    cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + ".png", cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA))
+                    number += 1
+                imageNumber = numpy.array(cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA)).reshape(
+                    17 * 17, -1)
+                trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
+                responses.append(int(len(responses) / 500))
+
+    return trainData
+
+def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = False):
+    img = cv2.imread(path)
+    if needInverse:
+        img = cv2.bitwise_not(img)
+    imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    cv2.imwrite(os.path.join(curFolder, 'test_inverse.png'), img)
+
+    # Save pictures to harddrive
+    # number = 0
+    # for item in trainData:
+    #     cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + ".png", item)
+    #     number += 1
+
+    xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
+    xGist_median = numpy.median(xGist) * 0.78
+    xGistNorm = [min(x, xGist_median) for x in xGist]
+    if drawPlot:
+        plt.title("Гистограмма по строкам")
+        plt.plot(range(len(xGist)), xGist); plt.show()
+        plt.title("Гистограмма по строкам new")
+        plt.plot(range(len(xGistNorm)), xGistNorm); plt.show()
+
+    xPoints = calcBorders(xGistNorm)
+
+    yGist = [sum(imgGray[:, k]) / len(imgGray[:, k]) for k in range(imgGray.shape[1])]
+    yGist_median = numpy.median(yGist) * 0.78
+    yGistNorm = [min(x, yGist_median) for x in yGist]
+
+    if drawPlot:
+        plt.title("Гистограмма по столбцам")
+        plt.plot(range(len(yGist)), yGist); plt.show()
+        plt.title("Гистограмма по стобцам new")
+        plt.plot(range(len(yGistNorm)), yGistNorm); plt.show()
+
+    yPoints = calcBorders(yGistNorm)
+
+    trainData = []
+    responses = []
+    for x in range(min(len(xPoints['start']), len(xPoints['end']))):
+        for y in range(min(len(yPoints['start']), len(yPoints['end']))):
+            imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
+                          yPoints['start'][y]:yPoints['end'][y] + 1]
+            if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
+                imageNumber = numpy.array(cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA)).reshape(
+                    17 * 17, -1)
+                trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
+                responses.append(int(len(responses) / 500))
+    return trainData
 
 im = cv.imread(os.path.join(trainsetFolder, 'digits_inverse.png'))
 
@@ -46,11 +145,11 @@ xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
 xGist_median = numpy.median(xGist) * 0.78
 xGistNorm = [min(x, xGist_median) for x in xGist]
 # img1 = [img0[x] - minimal for x in range(len(img0))]
-plt.title("Гистограмма по строкам")
-plt.plot(range(len(xGist)), xGist); plt.show()
-
-plt.title("Гистограмма по строкам new")
-plt.plot(range(len(xGistNorm)), xGistNorm); plt.show()
+# plt.title("Гистограмма по строкам")
+# plt.plot(range(len(xGist)), xGist); plt.show()
+#
+# plt.title("Гистограмма по строкам new")
+# plt.plot(range(len(xGistNorm)), xGistNorm); plt.show()
 
 xPoints = calcBorders(xGistNorm)
 
@@ -58,10 +157,10 @@ yGist = [sum(imgGray[:, k]) / len(imgGray[:, k]) for k in range(imgGray.shape[1]
 yGist_median = numpy.median(yGist) * 0.78
 yGistNorm = [min(x, yGist_median) for x in yGist]
 
-plt.title("Гистограмма по столбцам")
-plt.plot(range(len(yGist)), yGist); plt.show()
-plt.title("Гистограмма по стобцам new")
-plt.plot(range(len(yGistNorm)), yGistNorm); plt.show()
+# plt.title("Гистограмма по столбцам")
+# plt.plot(range(len(yGist)), yGist); plt.show()
+# plt.title("Гистограмма по стобцам new")
+# plt.plot(range(len(yGistNorm)), yGistNorm); plt.show()
 
 yPoints = calcBorders(yGistNorm)
 
@@ -89,10 +188,16 @@ knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
-res, results, neighbours ,dist = knn.findNearest(numpy.array(trainData[4700], dtype=numpy.float32).reshape(1,-1), 3)
+# test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
+test = prepareImage(os.path.join(curFolder, 'test5_1.png'), False, True, saveToFiles=True)
 
-print( "result: ", results,"\n")
-print( "neighbours: ", neighbours,"\n")
-print( "distance: ", dist)
+resultsList = []
+for item in test:
+    res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 250)
+    resultsList.append(results[0][0])
+    # print( "result: ", results,"\n")
+    # print( "neighbours: ", neighbours,"\n")
+    # print( "distance: ", dist)
 
-plt.show()
+
+print(resultsList)
