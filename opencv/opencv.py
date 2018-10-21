@@ -91,8 +91,8 @@ def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = F
     #     number += 1
 
     xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
-    xGist_median = numpy.median(xGist) * 0.78
-    xGistNorm = [min(x, xGist_median) for x in xGist]
+    xGist_median = numpy.median(xGist) *0.45
+    xGistNorm = [min(x, 10) for x in xGist]
     if drawPlot:
         plt.title("Гистограмма по строкам")
         plt.plot(range(len(xGist)), xGist); plt.show()
@@ -101,29 +101,38 @@ def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = F
 
     xPoints = calcBorders(xGistNorm)
 
-    yGist = [sum(imgGray[:, k]) / len(imgGray[:, k]) for k in range(imgGray.shape[1])]
-    yGist_median = numpy.median(yGist) * 0.78
-    yGistNorm = [min(x, yGist_median) for x in yGist]
-
-    if drawPlot:
-        plt.title("Гистограмма по столбцам")
-        plt.plot(range(len(yGist)), yGist); plt.show()
-        plt.title("Гистограмма по стобцам new")
-        plt.plot(range(len(yGistNorm)), yGistNorm); plt.show()
-
-    yPoints = calcBorders(yGistNorm)
-
     trainData = []
     responses = []
+    number = 0
     for x in range(min(len(xPoints['start']), len(xPoints['end']))):
+        curImage = imgGray[xPoints['start'][x]:xPoints['end'][x] +1, :]
+        yGist = [sum(curImage[:, k]) / len(curImage[:, k]) for k in range(curImage.shape[1])]
+        yGist_median = numpy.median(yGist) * 0.2
+        yGistNorm = [min(x, 10) for x in yGist]
+        yPoints = calcBorders(yGistNorm)
+
+        if drawPlot:
+            plt.title("Гистограмма по столбцам")
+            plt.plot(range(len(yGist)), yGist);
+            plt.show()
+            plt.title("Гистограмма по стобцам new")
+            plt.plot(range(len(yGistNorm)), yGistNorm);
+            plt.show()
+
         for y in range(min(len(yPoints['start']), len(yPoints['end']))):
             imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
                           yPoints['start'][y]:yPoints['end'][y] + 1]
             if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
+                if saveToFiles:
+                    cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + ".png",
+                                cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA))
+                    number += 1
                 imageNumber = numpy.array(cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA)).reshape(
                     17 * 17, -1)
                 trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
                 responses.append(int(len(responses) / 500))
+
+
     return trainData
 
 im = cv.imread(os.path.join(trainsetFolder, 'digits_inverse.png'))
@@ -189,7 +198,7 @@ responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
-test = prepareImage(os.path.join(curFolder, 'test5_1.png'), False, True, saveToFiles=True)
+test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, True, saveToFiles=True)
 
 resultsList = []
 for item in test:
