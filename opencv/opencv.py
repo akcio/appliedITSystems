@@ -36,7 +36,7 @@ def prepareImage(path, needInverse = False, drawPlot = False, saveToFiles = Fals
 
     xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
     xGist_median = numpy.median(xGist) * 0.78
-    xGistNorm = [min(x, xGist_median) for x in xGist]
+    xGistNorm = [1 if x > xGist_median else 0 for x in xGist]
     if drawPlot:
         plt.title("Гистограмма по строкам")
         plt.plot(range(len(xGist)), xGist); plt.show()
@@ -72,7 +72,7 @@ def prepareImage(path, needInverse = False, drawPlot = False, saveToFiles = Fals
                 imageNumber = numpy.array(cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA)).reshape(
                     17 * 17, -1)
                 trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
-                responses.append(int(len(responses) / 500))
+                responses.append(len(responses) // 500)
 
     return trainData
 
@@ -175,15 +175,18 @@ yPoints = calcBorders(yGistNorm)
 
 trainData = []
 responses = []
+number = 0
 for x in range(min(len(xPoints['start']), len(xPoints['end']))):
     for y in range(min(len(yPoints['start']), len(yPoints['end']))):
         imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
                     yPoints['start'][y]:yPoints['end'][y] + 1]
         if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
+            # cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + "_" + str(int(len(responses) / 500)) + ".png",
+            #             cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA))
             imageNumber = numpy.array(cv2.resize(imageNumber, (17,17), interpolation=cv2.INTER_AREA)).reshape(17*17, -1)
             trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
             responses.append(int(len(responses) / 500))
-
+            number +=1
 
 
 #Save pictures to harddrive
@@ -198,11 +201,11 @@ responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
-test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, True, saveToFiles=True)
+test = prepareImageNew(os.path.join(curFolder, 'test5_1.png'), False, False, saveToFiles=False)
 
 resultsList = []
 for item in test:
-    res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 250)
+    res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 100)
     resultsList.append(results[0][0])
     # print( "result: ", results,"\n")
     # print( "neighbours: ", neighbours,"\n")
