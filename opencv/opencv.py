@@ -15,9 +15,9 @@ def calcBorders(points : list):
     pointsEnd = []
     for item in range(2, len(points)):
         if (points[item] - points[item - 1]) > 0 and not lastPlus:
-            pointsStart += [item]
+            pointsStart += [item-1]
         if (points[item] - points[item - 1]) < 0 and not lastMinus:
-            pointsEnd += [item]
+            pointsEnd += [item+1]
         lastPlus = (points[item] - points[item - 1]) > 0
         lastMinus = (points[item] - points[item - 1]) < 0
     return {'start' : pointsStart, 'end' : pointsEnd}
@@ -196,38 +196,39 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
 #     number += 1
 print("Len trainData:", len(trainData))
 
-checkData = []
-checkResponse = []
-import random
-for i in range(int(len(trainData)*0.2)):
-    number = random.randint(0, len(trainData) - 1)
-    checkResponse.append(responses[number])
-    del responses[number]
-    checkData.append(trainData[number])
-    del trainData[number]
-
-print(len(trainData), len(checkData))
+# checkData = []
+# checkResponse = []
+# import random
+# for i in range(int(len(trainData)*0.2)):
+#     number = random.randint(0, len(trainData) - 1)
+#     checkResponse.append(responses[number])
+#     del responses[number]
+#     checkData.append(trainData[number])
+#     del trainData[number]
+# print(len(trainData), len(checkData))
 
 knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
-for kNeares in range(1, 20):
-    success = 0
-    total = 0
-    for i in range(len(checkData)):
-        res, results, neighbours, dist = knn.findNearest(numpy.array(checkData[i], dtype=numpy.float32).reshape(1, -1), kNeares)
-        if res == checkResponse[i]:
-            success += 1
-        total += 1
-    print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
+
+# for kNeares in range(1, 8):
+#     success = 0
+#     total = 0
+#     for t in range(3):
+#         for i in range(len(checkData)):
+#             res, results, neighbours, dist = knn.findNearest(numpy.array(checkData[i], dtype=numpy.float32).reshape(1, -1), kNeares)
+#             if res == checkResponse[i]:
+#                 success += 1
+#             total += 1
+#     print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
 
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
-test = prepareImageNew(os.path.join(curFolder, 'test5_1.png'), False, False, saveToFiles=False)
+test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
 
 resultsList = []
 for item in test:
-    res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 100)
+    res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 3)
     resultsList.append(results[0][0])
     # print( "result: ", results,"\n")
     # print( "neighbours: ", neighbours,"\n")
