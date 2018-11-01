@@ -36,7 +36,8 @@ def prepareImage(path, needInverse = False, drawPlot = False, saveToFiles = Fals
 
     xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
     xGist_median = numpy.median(xGist) * 0.78
-    xGistNorm = [min(x, xGist_median) for x in xGist]
+    # xGistNorm = [min(x, xGist_median) for x in xGist]
+    xGistNorm = [0 if x < xGist_median else 1 for x in xGist]
     if drawPlot:
         plt.title("Гистограмма по строкам")
         plt.plot(range(len(xGist)), xGist); plt.show()
@@ -47,7 +48,7 @@ def prepareImage(path, needInverse = False, drawPlot = False, saveToFiles = Fals
 
     yGist = [sum(imgGray[:, k]) / len(imgGray[:, k]) for k in range(imgGray.shape[1])]
     yGist_median = numpy.median(yGist) * 0.78
-    yGistNorm = [min(x, yGist_median) for x in yGist]
+    yGistNorm = [0 if x < yGist_median else 1  for x in yGist]
 
     if drawPlot:
         plt.title("Гистограмма по столбцам")
@@ -92,7 +93,7 @@ def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = F
 
     xGist = [sum(imgGray[k]) / len(imgGray[k]) for k in range(imgGray.shape[0])]
     xGist_median = numpy.median(xGist) *0.45
-    xGistNorm = [min(x, 10) for x in xGist]
+    xGistNorm = [0 if x < 10 else 1 for x in xGist]
     if drawPlot:
         plt.title("Гистограмма по строкам")
         plt.plot(range(len(xGist)), xGist); plt.show()
@@ -108,7 +109,7 @@ def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = F
         curImage = imgGray[xPoints['start'][x]:xPoints['end'][x] +1, :]
         yGist = [sum(curImage[:, k]) / len(curImage[:, k]) for k in range(curImage.shape[1])]
         yGist_median = numpy.median(yGist) * 0.2
-        yGistNorm = [min(x, 10) for x in yGist]
+        yGistNorm = [0 if x < 10 else 1 for x in yGist]
         yPoints = calcBorders(yGistNorm)
 
         if drawPlot:
@@ -193,12 +194,34 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
 #     number += 1
 print("Len trainData:", len(trainData))
 
+checkData = []
+checkResponse = []
+import random
+for i in range(int(len(trainData)*0.2)):
+    number = random.randint(0, len(trainData) - 1)
+    checkResponse.append(responses[number])
+    del responses[number]
+    checkData.append(trainData[number])
+    del trainData[number]
+
+print(len(trainData), len(checkData))
+
 knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
+for kNeares in range(1, 20):
+    success = 0
+    total = 0
+    for i in range(len(checkData)):
+        res, results, neighbours, dist = knn.findNearest(numpy.array(checkData[i], dtype=numpy.float32).reshape(1, -1), kNeares)
+        if res == checkResponse[i]:
+            success += 1
+        total += 1
+    print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
+
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
-test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, True, saveToFiles=True)
+test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, True, saveToFiles=False)
 
 resultsList = []
 for item in test:
