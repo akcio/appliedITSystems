@@ -5,6 +5,8 @@ import matplotlib as be
 from matplotlib import pyplot as plt
 import numpy
 from matplotlib import pyplot
+import sklearn
+from sklearn.decomposition import KernelPCA
 
 print(cv2.__version__)
 
@@ -209,6 +211,10 @@ print("Len trainData:", len(trainData))
 
 knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
+
+kpca = KernelPCA(n_components=1, kernel='rbf', gamma=15)
+trainData = [kpca.fit_transform(x) for x in trainData]
+
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
 
@@ -236,3 +242,4 @@ for item in test:
 
 
 print(resultsList)
+
