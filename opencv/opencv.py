@@ -198,36 +198,52 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
 #     number += 1
 print("Len trainData:", len(trainData))
 
-# checkData = []
-# checkResponse = []
-# import random
-# for i in range(int(len(trainData)*0.2)):
-#     number = random.randint(0, len(trainData) - 1)
-#     checkResponse.append(responses[number])
-#     del responses[number]
-#     checkData.append(trainData[number])
-#     del trainData[number]
-# print(len(trainData), len(checkData))
+checkData = []
+checkResponse = []
+import random
+for i in range(int(len(trainData)*0.2)):
+    number = random.randint(0, len(trainData) - 1)
+    checkResponse.append(responses[number])
+    del responses[number]
+    checkData.append(trainData[number])
+    del trainData[number]
+print(len(trainData), len(checkData))
 
 knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
+
+knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
+
+print("Without PCA")
+for kNeares in range(1, 8):
+    success = 0
+    total = 0
+    for t in range(3):
+        for i in range(len(checkData)):
+            res, results, neighbours, dist = knn.findNearest(numpy.array(checkData[i], dtype=numpy.float32).reshape(1, -1), kNeares)
+            if res == checkResponse[i]:
+                success += 1
+            total += 1
+    print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
+
+print("With PCA")
 
 kpca = KernelPCA(n_components=1, kernel='rbf', gamma=15)
 trainData = [kpca.fit_transform(x) for x in trainData]
 
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
+for kNeares in range(1, 8):
+    success = 0
+    total = 0
+    for t in range(3):
+        for i in range(len(checkData)):
+            res, results, neighbours, dist = knn.findNearest(numpy.array(kpca.fit_transform(checkData[i]), dtype=numpy.float32).reshape(1, -1), kNeares)
+            if res == checkResponse[i]:
+                success += 1
+            total += 1
+    print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
 
-# for kNeares in range(1, 8):
-#     success = 0
-#     total = 0
-#     for t in range(3):
-#         for i in range(len(checkData)):
-#             res, results, neighbours, dist = knn.findNearest(numpy.array(checkData[i], dtype=numpy.float32).reshape(1, -1), kNeares)
-#             if res == checkResponse[i]:
-#                 success += 1
-#             total += 1
-#     print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
 
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
 test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
