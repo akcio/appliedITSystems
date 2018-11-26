@@ -216,6 +216,7 @@ knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, respon
 
 print("Without PCA")
 for kNeares in range(1, 8):
+    break
     success = 0
     total = 0
     for t in range(3):
@@ -228,19 +229,34 @@ for kNeares in range(1, 8):
 
 print("With PCA")
 
-kpca = KernelPCA(n_components=1, kernel='rbf', gamma=15)
-trainData = [kpca.fit_transform(x) for x in trainData]
+temp = numpy.array(trainData).reshape(len(trainData), -1)
 
-knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
+kpca = KernelPCA(n_components=10, kernel='rbf')
+
+kpca.fit(temp, responses)
+
+trainData = kpca.transform(temp)
+
+
+# knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
+knn.train(trainData, cv2.ml.ROW_SAMPLE, responses)
+
+for i in range(len(checkData)):
+    checkData[i] = kpca.transform(numpy.array(checkData[i]).reshape(-1, 17*17))
+
 
 for kNeares in range(1, 8):
     success = 0
     total = 0
     for t in range(3):
         for i in range(len(checkData)):
-            res, results, neighbours, dist = knn.findNearest(numpy.array(kpca.fit_transform(checkData[i]), dtype=numpy.float32).reshape(1, -1), kNeares)
-            if res == checkResponse[i]:
-                success += 1
+            try:
+                # temp = kpca.transform(numpy.array(checkData[i]).reshape(-1, 17*17))
+                res, results, neighbours, dist = knn.findNearest(checkData[i], kNeares)
+                if res == checkResponse[i]:
+                    success += 1
+            except Exception as ex:
+                print(ex)
             total += 1
     print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
 
