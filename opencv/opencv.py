@@ -215,8 +215,8 @@ responses = numpy.array(responses)
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
 print("Without PCA")
-for kNeares in range(1, 8):
-    break
+for kNeares in range(1, 5):
+    # break
     success = 0
     total = 0
     for t in range(3):
@@ -230,10 +230,9 @@ for kNeares in range(1, 8):
 print("With PCA")
 
 temp = numpy.array(trainData).reshape(len(trainData), -1)
+kpca = KernelPCA(n_components=50, kernel='linear')
 
-kpca = KernelPCA(n_components=10, kernel='rbf')
-
-kpca.fit(temp, responses)
+kpca.fit(temp)
 
 trainData = kpca.transform(temp)
 
@@ -265,12 +264,12 @@ for kNeares in range(1, 8):
 test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
 
 resultsList = []
-for item in test:
-    res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 3)
-    resultsList.append(results[0][0])
-    # print( "result: ", results,"\n")
-    # print( "neighbours: ", neighbours,"\n")
-    # print( "distance: ", dist)
+# for item in test:
+#     res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 3)
+#     resultsList.append(results[0][0])
+#     # print( "result: ", results,"\n")
+#     # print( "neighbours: ", neighbours,"\n")
+#     # print( "distance: ", dist)
 
 
 print(resultsList)
