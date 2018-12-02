@@ -65,7 +65,7 @@ mser = cv2.MSER_create()
 #Your image path i-e receipt path
 curFolder = os.path.dirname(__file__)
 img = cv2.imread(os.path.join(curFolder, 'trainset/digits.png')) #'test5.png'))
-img = cv2.imread(os.path.join(curFolder, 'test5.png'))
+# img = cv2.imread(os.path.join(curFolder, 'test5.png'))
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 # loop over the digit area candidates
 vis = img.copy()

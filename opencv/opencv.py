@@ -164,23 +164,24 @@ def prepareImageMSER(path):
                 # hasBigger = True
                 if (wi * hi > ws * hs):
                     hasBigger = True
-                    # print(ws*hs, wi*hi, hulls[i], hulls[k])
-                    # if xs >= xi and xs <= xi+wi and ys >= yi and ys <= yi+hi:
-                    #     hasBigger = True
-                    # if xs + ws  >= xi and xs + ws <= xi+wi and ys +hs >= yi and ys+hs <= yi+hi:
-                    #     hasBigger = True
+
         if not hasBigger:
             res.append(rectangles[i])
+
     rectangles = res
-    result = []
+
+    trainData = []
+
     for contour in rectangles:
         x, y, w, h = contour
         if w < 13 or h < 13:
             continue
-        newimg = img[y:y + h, x: x + w]
-        result.append(numpy.array(cv2.resize(newimg, (17,17), interpolation=cv2.INTER_AREA), dtype=numpy.float32).reshape(17*17,-1))
+        imageNumber = imgGray[y:y + h, x: x + w]
+        imageNumber = numpy.array(cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA)).reshape(
+            17 * 17, -1)
+        trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
 
-    return result
+    return trainData
 
 def newTrainData():
     from sklearn import datasets
@@ -332,7 +333,7 @@ for kNeares in range(1, 8):
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
 
 test = prepareImageMSER(os.path.join(curFolder, 'test5.png'))
-# /test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
+# test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
 
 resultsList = []
 for item in test:
