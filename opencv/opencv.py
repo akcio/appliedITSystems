@@ -122,8 +122,11 @@ def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = F
             plt.show()
 
         for y in range(min(len(yPoints['start']), len(yPoints['end']))):
-            imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
-                          yPoints['start'][y]:yPoints['end'][y] + 1]
+            imageNumber = imgGray[
+                          # xPoints['start'][x]-1, 0:xPoints['end'][x] + 1,
+                          max(xPoints['start'][x]-1, 0):xPoints['end'][x] + 1,
+                          max(yPoints['start'][y]-1, 0):yPoints['end'][y] + 1
+                          ]
             if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
                 if saveToFiles:
                     cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + ".png",
@@ -137,6 +140,68 @@ def prepareImageNew(path, needInverse = False, drawPlot = False, saveToFiles = F
 
     return trainData
 
+def prepareImageMSER(path):
+    img = cv2.imread(path)
+    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    mser = cv2.MSER_create()
+    regions, _ = mser.detectRegions(imgGray)
+
+    rectangles = list(set([cv2.boundingRect(x) for x in regions]))
+    res = []
+    for i in range(len(rectangles)):
+        xs, ys, ws, hs = rectangles[i]
+        hasBigger = False
+        for k in range(len(rectangles)):
+            if i == k:
+                continue
+            xi, yi, wi, hi = rectangles[k]
+            a = max(xi, xs)
+            b = min(xs + ws, xi + wi)
+            c = max(yi, ys)
+            d = min(ys + hs, yi + hi)
+
+            if (a < b) and (c < d):
+                # hasBigger = True
+                if (wi * hi > ws * hs):
+                    hasBigger = True
+                    # print(ws*hs, wi*hi, hulls[i], hulls[k])
+                    # if xs >= xi and xs <= xi+wi and ys >= yi and ys <= yi+hi:
+                    #     hasBigger = True
+                    # if xs + ws  >= xi and xs + ws <= xi+wi and ys +hs >= yi and ys+hs <= yi+hi:
+                    #     hasBigger = True
+        if not hasBigger:
+            res.append(rectangles[i])
+    rectangles = res
+    result = []
+    for contour in rectangles:
+        x, y, w, h = contour
+        if w < 13 or h < 13:
+            continue
+        newimg = img[y:y + h, x: x + w]
+        result.append(numpy.array(cv2.resize(newimg, (17,17), interpolation=cv2.INTER_AREA), dtype=numpy.float32).reshape(17*17,-1))
+
+    return result
+
+def newTrainData():
+    from sklearn import datasets
+    digits = datasets.load_digits()
+
+    tmp = [[i for i in range(len(digits['target'])) if digits['target'][i] == y] for y in range(10)]
+
+    allDigits = []
+    targets = []
+
+    # imageNumber = numpy.array(cv2.resize(imageNumber, (17,17), interpolation=cv2.INTER_AREA)).reshape(17*17, -1)
+    #         trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
+
+    for digit in tmp:
+        for item in digit:
+
+            allDigits.append(numpy.array(cv2.resize(digits['images'][item], (17, 17), interpolation=cv2.INTER_AREA)).reshape(17*17, -1))
+            targets.append(digits['target'][item])
+
+    return allDigits, targets
+
 im = cv.imread(os.path.join(trainsetFolder, 'digits_inverse.png'))
 
 
@@ -148,7 +213,7 @@ ret, thresh = cv.threshold(imgray, 127, 255, 0)
 im2, contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
 cv2.drawContours(im, contours, -1, (0,255,0), 3)
-
+        
 img = cv2.imread(os.path.join(trainsetFolder, 'digits_inverse.png'))
 imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
@@ -183,8 +248,8 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
         imageNumber = imgGray[xPoints['start'][x]:xPoints['end'][x] + 1,
                     yPoints['start'][y]:yPoints['end'][y] + 1]
         if imageNumber.shape[0] > 10 and imageNumber.shape[1] > 10:
-            # cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + "_" + str(int(len(responses) / 500)) + ".png",
-            #             cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA))
+            cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + "_" + str(int(len(responses) / 500)) + ".png",
+                        cv2.resize(imageNumber, (17, 17), interpolation=cv2.INTER_AREA))
             imageNumber = numpy.array(cv2.resize(imageNumber, (17,17), interpolation=cv2.INTER_AREA)).reshape(17*17, -1)
             trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
             responses.append(int(len(responses) / 500))
@@ -196,6 +261,9 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
 # for item in trainData:
 #     cv2.imwrite(os.path.join(curFolder, 'tmp/item') + str(number) + ".png", item)
 #     number += 1
+
+trainData, responses = newTrainData()
+
 print("Len trainData:", len(trainData))
 
 checkData = []
@@ -216,7 +284,7 @@ knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, respon
 
 print("Without PCA")
 for kNeares in range(1, 5):
-    # break
+    break
     success = 0
     total = 0
     for t in range(3):
@@ -229,8 +297,8 @@ for kNeares in range(1, 5):
 
 print("With PCA")
 
-temp = numpy.array(trainData).reshape(len(trainData), -1)
-kpca = KernelPCA(n_components=50, kernel='linear')
+temp = numpy.array(trainData, dtype=numpy.float32).reshape(len(trainData), -1)
+kpca = KernelPCA(n_components=30, kernel='rbf', gamma=1e-8)
 
 kpca.fit(temp)
 
@@ -241,10 +309,11 @@ trainData = kpca.transform(temp)
 knn.train(trainData, cv2.ml.ROW_SAMPLE, responses)
 
 for i in range(len(checkData)):
-    checkData[i] = kpca.transform(numpy.array(checkData[i]).reshape(-1, 17*17))
+    checkData[i] = kpca.transform(numpy.array(checkData[i]).reshape(1, -1))
 
 
 for kNeares in range(1, 8):
+    break
     success = 0
     total = 0
     for t in range(3):
@@ -261,15 +330,17 @@ for kNeares in range(1, 8):
 
 
 # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
-test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
+
+test = prepareImageMSER(os.path.join(curFolder, 'test5.png'))
+# /test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
 
 resultsList = []
-# for item in test:
-#     res, results, neighbours ,dist = knn.findNearest(numpy.array(item, dtype=numpy.float32).reshape(1,-1), 3)
-#     resultsList.append(results[0][0])
-#     # print( "result: ", results,"\n")
-#     # print( "neighbours: ", neighbours,"\n")
-#     # print( "distance: ", dist)
+for item in test:
+    res, results, neighbours ,dist = knn.findNearest(kpca.transform(numpy.array(item, dtype=numpy.float32).reshape(-1, 17*17)).reshape(1,-1), 3)
+    resultsList.append(results[0][0])
+    print( "result: ", results,"\n")
+    print( "neighbours: ", neighbours,"\n")
+    # print( "distance: ", dist)
 
 
 print(resultsList)
