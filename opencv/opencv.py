@@ -232,6 +232,33 @@ def newTrainData():
 
     return allDigits, targets
 
+def face_trainData(needsave = False):
+    face_cascade = cv2.CascadeClassifier('trainset/haarcascade_frontalface_default.xml')
+
+    img = cv2.imread('trainset/yalefaces.png')
+
+    faces = face_cascade.detectMultiScale(img, scaleFactor=6.2)
+
+    print(len(faces))
+    imgNum = 0
+    faces = sorted(faces, key=lambda k: k[0] + k[1] * 10000)
+    trainData = []
+    responses = []
+    for (x, y, w, h) in faces:
+        tmpImage = img[y:y + h, x:x + w]
+        if needsave:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.imwrite("tmp/" + str(imgNum) + '.png', tmpImage)
+
+        imageNumber = numpy.array(cv2.resize(tmpImage, (30, 30), interpolation=cv2.INTER_AREA)).reshape(
+            30 * 30, -1)
+        responses.append(int(imgNum/11))
+        imgNum += 1
+        trainData += [numpy.array(imageNumber, dtype=numpy.float32)]
+
+    return trainData, responses
+
+
 im = cv.imread(os.path.join(trainsetFolder, 'digits_inverse.png'))
 
 
@@ -293,7 +320,8 @@ for x in range(min(len(xPoints['start']), len(xPoints['end']))):
 #     number += 1
 
 # trainData, responses = newTrainData()
-trainData = prepareImageMSER(os.path.join(curFolder, 'trainset/digits_inverse4.png'))
+trainData, responses = face_trainData()
+# trainData = prepareImageMSER(os.path.join(curFolder, 'trainset/digits_inverse4.png'))
 
 print("Len trainData:", len(trainData))
 
@@ -307,15 +335,14 @@ for i in range(int(len(trainData)*0.2)):
     checkData.append(trainData[number])
     del trainData[number]
 print(len(trainData), len(checkData))
-
 knn = cv2.ml.KNearest_create()
 responses = numpy.array(responses)
 
 knn.train(numpy.array(trainData, dtype=numpy.float32), cv2.ml.ROW_SAMPLE, responses)
 
 print("Without PCA")
-for kNeares in range(1, 5):
-    break
+for kNeares in range(1, 6):
+    # break
     success = 0
     total = 0
     for t in range(3):
@@ -329,7 +356,7 @@ for kNeares in range(1, 5):
 print("With PCA")
 
 temp = numpy.array(trainData, dtype=numpy.float32).reshape(len(trainData), -1)
-kpca = KernelPCA(n_components=50,kernel='rbf', gamma=1e-8)
+kpca = KernelPCA(n_components=30,kernel='rbf', gamma=1e-9)
 
 kpca.fit(temp)
 
@@ -344,7 +371,7 @@ for i in range(len(checkData)):
 
 
 for kNeares in range(1, 8):
-    break
+    # break
     success = 0
     total = 0
     for t in range(3):
@@ -359,20 +386,19 @@ for kNeares in range(1, 8):
             total += 1
     print("k:", kNeares, "total:", total, "succ:", success, "error:", 1 - success / total)
 
+def findDigitsInImage():
+    # test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
 
-# test = prepareImage(os.path.join(curFolder, 'test_inverse2.png'))
+    test = prepareImageMSER(os.path.join(curFolder, 'test5.png'), needSave=True)
+    # test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
 
-test = prepareImageMSER(os.path.join(curFolder, 'test5.png'), needSave=True)
-# test = prepareImageNew(os.path.join(curFolder, 'test5.png'), False, False, saveToFiles=True)
-
-resultsList = []
-for item in test:
-    res, results, neighbours ,dist = knn.findNearest(kpca.transform(numpy.array(item, dtype=numpy.float32).reshape(-1, 17*17)).reshape(1,-1), 3)
-    resultsList.append(results[0][0])
-    print( "result: ", results,"\n")
-    print( "neighbours: ", neighbours,"\n")
-    # print( "distance: ", dist)
+    resultsList = []
+    for item in test:
+        res, results, neighbours ,dist = knn.findNearest(kpca.transform(numpy.array(item, dtype=numpy.float32).reshape(-1, 17*17)).reshape(1,-1), 3)
+        resultsList.append(results[0][0])
+        # print( "result: ", results,"\n")
+        # print( "neighbours: ", neighbours,"\n")
+        # print( "distance: ", dist)
 
 
-print(resultsList)
-
+    print(resultsList)
